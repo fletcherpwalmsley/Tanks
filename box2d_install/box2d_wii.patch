@@ -1,0 +1,58 @@
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+index 6850684..cea5837 100644
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -1,4 +1,4 @@
+-﻿cmake_minimum_required(VERSION 3.22)
++﻿cmake_minimum_required(VERSION 3.18)
+ include(FetchContent)
+ include(CMakeDependentOption)
+ 
+diff --git a/src/CMakeLists.txt b/src/CMakeLists.txt
+index 0bc5077..73d3e2c 100644
+--- a/src/CMakeLists.txt
++++ b/src/CMakeLists.txt
+@@ -188,21 +188,31 @@ install(
+   RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
+ )
+ 
+-install(
+-  EXPORT box2dConfig
+-  NAMESPACE box2d::
+-  DESTINATION "${CMAKE_INSTALL_LIBDIR}/cmake/box2d"
+-)
++# install(
++#   EXPORT box2dConfig
++#   NAMESPACE box2d::
++#   DESTINATION "${CMAKE_INSTALL_LIBDIR}/cmake/box2d"
++# )
+ 
+-include(CMakePackageConfigHelpers)
++# include(CMakePackageConfigHelpers)
+ 
+-write_basic_package_version_file(
+-  "${CMAKE_CURRENT_BINARY_DIR}/box2dConfigVersion.cmake"
+-  COMPATIBILITY SameMajorVersion
+-)
++# write_basic_package_version_file(
++#   "${CMAKE_CURRENT_BINARY_DIR}/box2dConfigVersion.cmake"
++#   COMPATIBILITY SameMajorVersion
++# )
++
++# install(
++#   FILES "${CMAKE_CURRENT_BINARY_DIR}/box2dConfigVersion.cmake"
++#   DESTINATION "${CMAKE_INSTALL_LIBDIR}/cmake/box2d"
++# )
++
++include(GNUInstallDirs)
+ 
+ install(
+-  FILES "${CMAKE_CURRENT_BINARY_DIR}/box2dConfigVersion.cmake"
+-  DESTINATION "${CMAKE_INSTALL_LIBDIR}/cmake/box2d"
++  DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/../include/"
++  DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}
+ )
+ 
++install(TARGETS box2d
++  ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
++)
