@@ -1,7 +1,7 @@
 {
     "name": "devkitPPC",
     "image": "devkitpro/devkitppc:latest",
-    "postCreateCommand": "./box2d_install/install_box2d.sh",
+    "postCreateCommand": "cd box2d_install && chmod +x install_box2d.sh && ./install_box2d.sh",
     "customizations": {
         "vscode": {
             "extensions": [

@@ -19,5 +19,5 @@ cd build
 /opt/devkitpro/portlibs/wii/bin/powerpc-eabi-cmake ..
 cmake --build . -j 6
 cmake --install .
-cd ..
+cd ../..
 rm -rf box2d
