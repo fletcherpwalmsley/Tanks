@@ -1,6 +1,18 @@
 #!/usr/bin/env bash
 
-# Get Box2d
+# Get and install GRRLIB
+if [ ! -d "GRRLIB" ]; then
+    # Clone the box2d repository from GitHub
+    echo "GRRLIB does not exist. Cloning from GitHub..."
+    git clone https://github.com/GRRLIB/GRRLIB.git
+fi
+cd GRRLIB
+/opt/devkitpro/portlibs/wii/bin/powerpc-eabi-cmake -B build
+cmake --build build -j 2 --target install
+cd ..
+rm -rf GRRLIB
+
+# Get and install Box2d
 if [ ! -d "box2d" ]; then
     # Clone the box2d repository from GitHub
     echo "box2d does not exist. Cloning from GitHub..."
@@ -17,7 +29,7 @@ rm -rf build
 mkdir build
 cd build
 /opt/devkitpro/portlibs/wii/bin/powerpc-eabi-cmake ..
-cmake --build . -j 6
+cmake --build . -j 2
 cmake --install .
 cd ../..
 rm -rf box2d
