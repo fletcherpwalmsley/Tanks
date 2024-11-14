@@ -1,5 +1,5 @@
 /*===========================================
-                  box2d-wii
+                  Tanks?
                - hello_box2d -
 
     Port of the hello box2d example to wii
