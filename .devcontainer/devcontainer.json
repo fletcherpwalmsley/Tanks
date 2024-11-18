@@ -1,13 +1,14 @@
 {
     "name": "devkitPPC",
     "image": "devkitpro/devkitppc:latest",
-    "postCreateCommand": "cd box2d_install && chmod +x install_box2d.sh && ./install_box2d.sh",
+    "postCreateCommand": "cd env_setup && chmod +x setup.sh && ./setup.sh",
     "customizations": {
         "vscode": {
             "extensions": [
                 "ms-vscode.cpptools",
                 "ms-vscode.cpptools-extension-pack",
-                "ms-vscode.makefile-tools"
+                "ms-vscode.makefile-tools",
+                "streetsidesoftware.code-spell-checker"
             ]
         }
     }
