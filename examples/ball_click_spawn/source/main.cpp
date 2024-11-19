@@ -171,14 +171,22 @@ int main(int argc, char **argv) {
         GRRLIB_FillScreen(0xFFFFFFFF);
         for (auto box : boxes) {
             b2Vec2 position = b2Body_GetPosition(box.body);
+            b2Vec2 linearVelocity = b2Body_GetLinearVelocity(box.body);
+            b2Vec2 directionUnitVector = b2Normalize(linearVelocity);
 
             GRRLIB_Circle(
                 position.x*WorldToWindowScale,
-                position.y*WorldToWindowScale,
+                480 - position.y*WorldToWindowScale,
                 2.5*WorldToWindowScale,
                 box.colour,
                 1
             );
+            GRRLIB_Line(
+                position.x * WorldToWindowScale,
+                480 - position.y * WorldToWindowScale,
+                (position.x * WorldToWindowScale) + (directionUnitVector.x * 40),
+                (480 - position.y * WorldToWindowScale) - (directionUnitVector.y * 40),
+                box.colour); // Top edge
         }
         // Draw Crosshair
         GRRLIB_DrawImg(P1MX, P1MY, crosshair, 0, 1, 1, RGBA(255, 255, 255, 255));
