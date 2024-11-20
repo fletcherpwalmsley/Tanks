@@ -50,6 +50,30 @@ double angleBetweenPoints(double x1, double y1, double x2, double y2) {
     return theta;
 }
 
+
+double calculateAngle(double x, double y) {
+    // Shift the point (x, y) relative to the new origin (320, 240)
+    double shiftedX = x - 320;
+    double shiftedY = y - 240;
+
+    // Calculate the dot product of the y-axis vector (0, 1) and the shifted vector
+    double dotProduct = shiftedY;
+
+    // Calculate the magnitudes of the vectors
+    double magnitudeV = sqrt(shiftedX * shiftedX + shiftedY * shiftedY);
+
+    // Calculate the cosine of the angle
+    double cosTheta = dotProduct / magnitudeV;
+
+    // Calculate the angle in radians
+    double angleRadians = acos(cosTheta);
+
+    // Convert the angle to degrees
+    double angleDegrees = angleRadians * (180.0 / M_PI);
+
+    return 90 - angleDegrees;
+}
+
 // Function to convert radians to degrees
 double radiansToDegrees(double radians) {
     return radians * 180.0 / M_PI;
@@ -81,7 +105,6 @@ int main(void){
     GRRLIB_SetBackgroundColour(0x00, 0x00, 0x00, 0xFF);
     f32 view_angle = 0.0f;
     f32 turret_angle = 30.0f;
-
     while(1) {
         GRRLIB_Camera3dSettings(0.0f,0.0f,5.0f, 1,0,0, 0,0,0);
         GRRLIB_2dMode();
@@ -98,6 +121,8 @@ int main(void){
         if (turret_angle>360) {
             turret_angle=0.0;
         }
+
+        double theta = calculateAngle(P1MX, P1MY);
 
         GRRLIB_3dMode(0.1,1000,45,0,1);
         GRRLIB_SetLightAmbient(0x111111FF);
@@ -121,7 +146,7 @@ int main(void){
         GRRLIB_ObjectViewBegin();
         GRRLIB_ObjectViewTrans(0.0f, 0.0f, 0.5);
         GRRLIB_ObjectViewScale(1.0f, 1.0f, 0.8f);
-        GRRLIB_ObjectViewRotate(0.0f, view_angle, turret_angle);
+        GRRLIB_ObjectViewRotate(0.0f, view_angle, theta);
         GRRLIB_ObjectViewEnd();
         GRRLIB_DrawCube(0.4f,1,0x5ba047FF);
 
@@ -130,7 +155,7 @@ int main(void){
         // GRRLIB_ObjectViewRotate(0.0f, 0.0f, turret_angle);
         GRRLIB_ObjectViewTrans(0.0f, 0.5f, 0.425);
         // GRRLIB_ObjectViewScale(1.0f, 1.0f, 0.8f);
-        GRRLIB_ObjectViewRotate(0.0f, view_angle, turret_angle);
+        GRRLIB_ObjectViewRotate(0.0f, view_angle, theta);
         GRRLIB_ObjectViewEnd();
         GRRLIB_DrawCylinder(0.09, 0.8, 15, 1, 0Xd9b77cFF);
 
@@ -141,12 +166,13 @@ int main(void){
         // Calculate the angle between the points in radians
         // double angleRad = angleBetweenPoints(P1MX, P1MY, 320, 240);
         GRRLIB_DrawImg(P1MX, P1MY, crosshair, 0, 1, 1, RGBA(255, 255, 255, 255));
-        float w1 = P1MX;
-        float v1 = P1MX;
-        float w2 = 320;
-        float v2 = 240;
+        // float w1 = P1MX;
+        // float v1 = P1MY;
+        // float w2 = 320;
+        // float v2 = 240;
 
-        double theta = atan2((w2 * v1 + w1 * v2), (w1 * v1 + w2 * v2));
+        // double theta = atan2((w2 * v1 + w1 * v2), (w1 * v1 + w2 * v2));
+        // double theta = calculateAngle(P1MX, P1MY);
         
         GRRLIB_Printf((640-(16*29))/2, 20, tex_font, 0xFFFFFFFF, 1, "TURRET ANGLE: %4.2f", turret_angle);
         GRRLIB_Printf((640-(16*29))/2, 40, tex_font, 0xFFFFFFFF, 1, "P1MX: %i", P1MX);
