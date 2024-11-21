@@ -17,6 +17,7 @@
 #include "font_png.h"
 #include "crosshair_png.h"
 
+const int fiddle_angle = 30;
 
 // Function to calculate the dot product of two vectors
 double dotProduct(double x1, double y1, double x2, double y2) {
@@ -50,11 +51,47 @@ double angleBetweenPoints(double x1, double y1, double x2, double y2) {
     return theta;
 }
 
+/**
+ * Convert a point in the 2d view plane to the 2d game plane
+ * This is a 2d operation as the rotation is constrand around an
+ * axis
+ * 
+ * Will almost certainly be something in Grrlib or libogc to do this
+ * work for me in the main game
+ */
+// void viewToGamePlaneTranslate(const double& angle,
+//                               const int& viewX,
+//                               const int& viewY,
+//                               double& gameX,
+//                               double& gameY) {
+//     double angle_rad = angle * M_PI / 180.0;
+//     gameX = cos(angle_rad)*viewX - sin(angle_rad)*viewY;
+//     gameY = sin(angle_rad)*viewX + cos(angle_rad)*viewY;
+// }
+
+
+void viewToGamePlaneTranslate(const double& angle,
+                              const int& viewX,
+                              const int& viewY,
+                              double& gameX,
+                              double& gameY) {
+    double angle_rad = angle * M_PI / 180.0;
+    gameX = cos(angle_rad)*viewY - sin(angle_rad)*viewX;
+    gameY = sin(angle_rad)*viewY + cos(angle_rad)*viewX;
+}
+
+
 
 double calculateAngle(double x, double y) {
     // Shift the point (x, y) relative to the new origin (320, 240)
-    double shiftedX = x - 320;
-    double shiftedY = y - 240;
+    const int viewMidX = 320;
+    const int viewMidY = 240;
+    double gameMidX;
+    double gameMidY;
+    viewToGamePlaneTranslate(fiddle_angle, viewMidX, viewMidY, gameMidX, gameMidY);
+    
+    double shiftedX = x - gameMidX;
+    double shiftedY = y - gameMidY;
 
     // Calculate the dot product of the y-axis vector (0, 1) and the shifted vector
     double dotProduct = shiftedY;
@@ -71,14 +108,19 @@ double calculateAngle(double x, double y) {
     // Convert the angle to degrees
     double angleDegrees = angleRadians * (180.0 / M_PI);
 
-    return 90 - angleDegrees;
+    // Bottom, Right
+    if ((x > gameMidX) && (y > gameMidY)) {
+        return 90 + angleDegrees;
+    }
+    // Top, Right
+    else if ((x > gameMidX) && (y < gameMidY)) {
+        return angleDegrees + 90;
+    }
+    // Only need to translate axis for left side of the screen
+    else {
+        return 90 - angleDegrees;
+    }
 }
-
-// Function to convert radians to degrees
-double radiansToDegrees(double radians) {
-    return radians * 180.0 / M_PI;
-}
-
 
 int main(void){
     GRRLIB_Init();
@@ -103,7 +145,7 @@ int main(void){
     GRRLIB_Settings.antialias = true;
 
     GRRLIB_SetBackgroundColour(0x00, 0x00, 0x00, 0xFF);
-    f32 view_angle = 0.0f;
+    f32 view_angle = 30.0f;
     f32 turret_angle = 30.0f;
     while(1) {
         GRRLIB_Camera3dSettings(0.0f,0.0f,5.0f, 1,0,0, 0,0,0);
@@ -114,15 +156,21 @@ int main(void){
         if(WPAD_ButtonsDown(0) & WPAD_BUTTON_HOME) exit(0);
 
         // Wii Remote IR Viewport correction
-        int P1MX = P1Mote.sx - 150;
-        int P1MY = P1Mote.sy - 150;
+        double P1MX = P1Mote.sx - 190;
+        double P1MY = P1Mote.sy - 190;
 
         turret_angle+=0.4;
         if (turret_angle>360) {
             turret_angle=0.0;
         }
 
-        double theta = calculateAngle(P1MX, P1MY);
+        // First, translate the points to the game plane
+        double gameX = 0;
+        double gameY = 0;
+        viewToGamePlaneTranslate(fiddle_angle, P1MX, P1MY, gameX, gameY);
+
+        // Find the angle for the turret!
+        double theta = calculateAngle(gameX, gameY);
 
         GRRLIB_3dMode(0.1,1000,45,0,1);
         GRRLIB_SetLightAmbient(0x111111FF);
@@ -166,19 +214,14 @@ int main(void){
         // Calculate the angle between the points in radians
         // double angleRad = angleBetweenPoints(P1MX, P1MY, 320, 240);
         GRRLIB_DrawImg(P1MX, P1MY, crosshair, 0, 1, 1, RGBA(255, 255, 255, 255));
-        // float w1 = P1MX;
-        // float v1 = P1MY;
-        // float w2 = 320;
-        // float v2 = 240;
+        GRRLIB_DrawImg(gameX, gameY, crosshair, 0, 1, 1, RGBA(255, 0, 0, 255));
 
-        // double theta = atan2((w2 * v1 + w1 * v2), (w1 * v1 + w2 * v2));
-        // double theta = calculateAngle(P1MX, P1MY);
-        
-        GRRLIB_Printf((640-(16*29))/2, 20, tex_font, 0xFFFFFFFF, 1, "TURRET ANGLE: %4.2f", turret_angle);
-        GRRLIB_Printf((640-(16*29))/2, 40, tex_font, 0xFFFFFFFF, 1, "P1MX: %i", P1MX);
-        GRRLIB_Printf((640-(16*29))/2, 60, tex_font, 0xFFFFFFFF, 1, "P1MY: %i", P1MY);
-        GRRLIB_Printf((640-(16*29))/2, 80, tex_font, 0xFFFFFFFF, 1, "POINTER TO TURRET RAD: %4.2f", theta);
-        GRRLIB_Printf((640-(16*29))/2, 100, tex_font, 0xFFFFFFFF, 1, "POINTER TO TURRET DEG: %4.2f", radiansToDegrees(theta));
+        // GRRLIB_Printf((640-(16*29))/2, 20, tex_font, 0xFFFFFFFF, 1, "TURRET ANGLE: %4.2f", turret_angle);
+        GRRLIB_Printf((640-(16*29))/2, 40, tex_font, 0xFFFFFFFF, 1, "GAMEX: %4.2f", gameX);
+        GRRLIB_Printf((640-(16*29))/2, 60, tex_font, 0xFFFFFFFF, 1, "P1MX: %4.2f", P1MX);
+        GRRLIB_Printf((640-(16*29))/2, 80, tex_font, 0xFFFFFFFF, 1, "GAMEY: %4.2f", gameY);
+        GRRLIB_Printf((640-(16*29))/2, 100, tex_font, 0xFFFFFFFF, 1, "P1MY: %4.2f", P1MY);
+        GRRLIB_Printf((640-(16*29))/2, 120, tex_font, 0xFFFFFFFF, 1, "POINTER TO TURRET DEG: %4.2f", theta);
         GRRLIB_Render();
     }
     GRRLIB_FreeTexture(tex_font);
