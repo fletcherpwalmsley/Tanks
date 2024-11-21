@@ -10,7 +10,7 @@
 #include <grrlib.h>
 
 #include <stdlib.h>
-#include <math.h>
+#include <cmath>
 #include <malloc.h>
 #include <wiiuse/wpad.h>
 
@@ -59,36 +59,42 @@ double angleBetweenPoints(double x1, double y1, double x2, double y2) {
  * Will almost certainly be something in Grrlib or libogc to do this
  * work for me in the main game
  */
-// void viewToGamePlaneTranslate(const double& angle,
-//                               const int& viewX,
-//                               const int& viewY,
-//                               double& gameX,
-//                               double& gameY) {
-//     double angle_rad = angle * M_PI / 180.0;
-//     gameX = cos(angle_rad)*viewX - sin(angle_rad)*viewY;
-//     gameY = sin(angle_rad)*viewX + cos(angle_rad)*viewY;
-// }
-
-
 void viewToGamePlaneTranslate(const double& angle,
                               const int& viewX,
                               const int& viewY,
                               double& gameX,
                               double& gameY) {
     double angle_rad = angle * M_PI / 180.0;
-    gameX = cos(angle_rad)*viewY - sin(angle_rad)*viewX;
-    gameY = sin(angle_rad)*viewY + cos(angle_rad)*viewX;
+    // gameX = cos(angle_rad)*viewX - sin(angle_rad)*viewY;
+    gameX = viewX;
+    // gameY = sin(angle_rad)*viewX + cos(angle_rad)*viewY;
+    gameY = cos(angle_rad)*viewY;
 }
 
 
+// void viewToGamePlaneTranslate(const double& angle,
+//                               const int& viewX,
+//                               const int& viewY,
+//                               double& gameX,
+//                               double& gameY) {
+//     (void) angle;
+//     gameX = viewX;
+//     gameY = viewY;
+// }
 
-double calculateAngle(double x, double y) {
+
+
+double calculateAngle(double x, double y, double offset) {
     // Shift the point (x, y) relative to the new origin (320, 240)
-    const int viewMidX = 320;
-    const int viewMidY = 240;
-    double gameMidX;
-    double gameMidY;
-    viewToGamePlaneTranslate(fiddle_angle, viewMidX, viewMidY, gameMidX, gameMidY);
+    // const int viewMidX = 320;
+    // const int viewMidY = 240;
+    // double gameMidX;
+    // double gameMidY;
+    // viewToGamePlaneTranslate(fiddle_angle, viewMidX, viewMidY, gameMidX, gameMidY);
+
+    y += (offset/2);
+    double gameMidX = 320;
+    double gameMidY = 240 + (offset/2);
     
     double shiftedX = x - gameMidX;
     double shiftedY = y - gameMidY;
@@ -167,10 +173,14 @@ int main(void){
         // First, translate the points to the game plane
         double gameX = 0;
         double gameY = 0;
-        viewToGamePlaneTranslate(fiddle_angle, P1MX, P1MY, gameX, gameY);
+        double correctCordSysY = (480 - P1MY);
+        viewToGamePlaneTranslate(fiddle_angle, P1MX, correctCordSysY, gameX, gameY);
+
+        double offset = correctCordSysY - gameY;
 
         // Find the angle for the turret!
-        double theta = calculateAngle(gameX, gameY);
+        double theta = calculateAngle(P1MX, P1MY, offset);
+        // double theta = -90;
 
         GRRLIB_3dMode(0.1,1000,45,0,1);
         GRRLIB_SetLightAmbient(0x111111FF);
@@ -185,7 +195,7 @@ int main(void){
 
         // Hull
         GRRLIB_ObjectViewBegin();
-        GRRLIB_ObjectViewScale(0.7f, 1.1f, 0.501f);
+        GRRLIB_ObjectViewScale(0.75f, 1.0f, 0.501f);
         GRRLIB_ObjectViewRotate(0.0f,view_angle,0.0f);
         GRRLIB_ObjectViewEnd();
         GRRLIB_DrawCube(1.0f,1,0x5ba047FF);
@@ -205,7 +215,7 @@ int main(void){
         // GRRLIB_ObjectViewScale(1.0f, 1.0f, 0.8f);
         GRRLIB_ObjectViewRotate(0.0f, view_angle, theta);
         GRRLIB_ObjectViewEnd();
-        GRRLIB_DrawCylinder(0.09, 0.8, 15, 1, 0Xd9b77cFF);
+        GRRLIB_DrawCylinder(0.1, 0.8, 15, 1, 0Xd9b77cFF);
 
         GRRLIB_2dMode();
 
@@ -214,14 +224,18 @@ int main(void){
         // Calculate the angle between the points in radians
         // double angleRad = angleBetweenPoints(P1MX, P1MY, 320, 240);
         GRRLIB_DrawImg(P1MX, P1MY, crosshair, 0, 1, 1, RGBA(255, 255, 255, 255));
-        GRRLIB_DrawImg(gameX, gameY, crosshair, 0, 1, 1, RGBA(255, 0, 0, 255));
+        // GRRLIB_DrawImg(gameX, P1MY + offset, crosshair, 0, 1, 1, RGBA(255, 0, 0, 255));
 
         // GRRLIB_Printf((640-(16*29))/2, 20, tex_font, 0xFFFFFFFF, 1, "TURRET ANGLE: %4.2f", turret_angle);
-        GRRLIB_Printf((640-(16*29))/2, 40, tex_font, 0xFFFFFFFF, 1, "GAMEX: %4.2f", gameX);
-        GRRLIB_Printf((640-(16*29))/2, 60, tex_font, 0xFFFFFFFF, 1, "P1MX: %4.2f", P1MX);
-        GRRLIB_Printf((640-(16*29))/2, 80, tex_font, 0xFFFFFFFF, 1, "GAMEY: %4.2f", gameY);
-        GRRLIB_Printf((640-(16*29))/2, 100, tex_font, 0xFFFFFFFF, 1, "P1MY: %4.2f", P1MY);
-        GRRLIB_Printf((640-(16*29))/2, 120, tex_font, 0xFFFFFFFF, 1, "POINTER TO TURRET DEG: %4.2f", theta);
+        // GRRLIB_Printf((640-(16*29))/2, 40, tex_font, 0xFFFFFFFF, 1, "GAMEX: %4.2f", gameX);
+        // GRRLIB_Printf((640-(16*29))/2, 60, tex_font, 0xFFFFFFFF, 1, "P1MX: %4.2f", P1MX);
+
+        GRRLIB_Printf((640-(16*29))/2, 20, tex_font, 0xFFFFFFFF, 1, "P1MY: %4.2f", P1MY);
+        GRRLIB_Printf((640-(16*29))/2, 40, tex_font, 0xFFFFFFFF, 1, "INVVIEWY: %4.2f", correctCordSysY);
+        GRRLIB_Printf((640-(16*29))/2, 60, tex_font, 0xFFFFFFFF, 1, "GAMEY: %4.2f", gameY);
+        GRRLIB_Printf((640-(16*29))/2, 80, tex_font, 0xFFFFFFFF, 1, "OFFSET: %4.2f", offset);
+
+        GRRLIB_Printf((640-(16*29))/2, 140, tex_font, 0xFFFFFFFF, 1, "POINTER TO TURRET DEG: %4.2f", theta);
         GRRLIB_Render();
     }
     GRRLIB_FreeTexture(tex_font);
