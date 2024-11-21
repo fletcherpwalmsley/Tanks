@@ -83,7 +83,6 @@ void viewToGamePlaneTranslate(const double& angle,
 // }
 
 
-
 double calculateAngle(double x, double y, double offset) {
     // Shift the point (x, y) relative to the new origin (320, 240)
     // const int viewMidX = 320;
@@ -92,9 +91,9 @@ double calculateAngle(double x, double y, double offset) {
     // double gameMidY;
     // viewToGamePlaneTranslate(fiddle_angle, viewMidX, viewMidY, gameMidX, gameMidY);
 
-    y += (offset/2);
+    y += (offset/4);
     double gameMidX = 320;
-    double gameMidY = 240 + (offset/2);
+    double gameMidY = 205 - (offset/2);
     
     double shiftedX = x - gameMidX;
     double shiftedY = y - gameMidY;
@@ -152,7 +151,7 @@ int main(void){
 
     GRRLIB_SetBackgroundColour(0x00, 0x00, 0x00, 0xFF);
     f32 view_angle = 30.0f;
-    f32 turret_angle = 30.0f;
+    f32 turret_angle = 0.0f;
     while(1) {
         GRRLIB_Camera3dSettings(0.0f,0.0f,5.0f, 1,0,0, 0,0,0);
         GRRLIB_2dMode();
@@ -176,11 +175,12 @@ int main(void){
         double correctCordSysY = (480 - P1MY);
         viewToGamePlaneTranslate(fiddle_angle, P1MX, correctCordSysY, gameX, gameY);
 
-        double offset = correctCordSysY - gameY;
+        // double offset = correctCordSysY - gameY;
+        double offset = 0;
 
         // Find the angle for the turret!
         double theta = calculateAngle(P1MX, P1MY, offset);
-        // double theta = -90;
+        // double theta = 0;
 
         GRRLIB_3dMode(0.1,1000,45,0,1);
         GRRLIB_SetLightAmbient(0x111111FF);
@@ -195,7 +195,7 @@ int main(void){
 
         // Hull
         GRRLIB_ObjectViewBegin();
-        GRRLIB_ObjectViewScale(0.75f, 1.0f, 0.501f);
+        GRRLIB_ObjectViewScale(0.75f, 1.1f, 0.501f);
         GRRLIB_ObjectViewRotate(0.0f,view_angle,0.0f);
         GRRLIB_ObjectViewEnd();
         GRRLIB_DrawCube(1.0f,1,0x5ba047FF);
@@ -223,8 +223,9 @@ int main(void){
         GRRLIB_2dMode();    
         // Calculate the angle between the points in radians
         // double angleRad = angleBetweenPoints(P1MX, P1MY, 320, 240);
-        GRRLIB_DrawImg(P1MX, P1MY, crosshair, 0, 1, 1, RGBA(255, 255, 255, 255));
-        // GRRLIB_DrawImg(gameX, P1MY + offset, crosshair, 0, 1, 1, RGBA(255, 0, 0, 255));
+        GRRLIB_DrawImg(P1MX, P1MY, crosshair, 0, 0.3, 0.3, RGBA(255, 255, 255, 255));
+        GRRLIB_Line(320, 205, P1MX, P1MY, 0x00FF00FF);
+        // GRRLIB_DrawImg(gameX, P1MY - offset, crosshair, 0, 1, 1, RGBA(255, 0, 0, 255));
 
         // GRRLIB_Printf((640-(16*29))/2, 20, tex_font, 0xFFFFFFFF, 1, "TURRET ANGLE: %4.2f", turret_angle);
         // GRRLIB_Printf((640-(16*29))/2, 40, tex_font, 0xFFFFFFFF, 1, "GAMEX: %4.2f", gameX);
