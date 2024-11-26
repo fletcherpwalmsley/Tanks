@@ -18,7 +18,7 @@
 #include "crosshair_png.h"
 
 const int fiddle_angle = 30;
-
+const int midPoint = 240;
 // Function to calculate the dot product of two vectors
 double dotProduct(double x1, double y1, double x2, double y2) {
     return x1 * x2 + y1 * y2;
@@ -93,7 +93,7 @@ double calculateAngle(double x, double y, double offset) {
 
     y += (offset/4);
     double gameMidX = 320;
-    double gameMidY = 205 - (offset/2);
+    double gameMidY = midPoint - (offset/2);
     
     double shiftedX = x - gameMidX;
     double shiftedY = y - gameMidY;
@@ -150,8 +150,7 @@ int main(void){
     GRRLIB_Settings.antialias = true;
 
     GRRLIB_SetBackgroundColour(0x00, 0x00, 0x00, 0xFF);
-    f32 view_angle = 30.0f;
-    f32 turret_angle = 0.0f;
+    f32 view_angle = 90.0f;
     while(1) {
         GRRLIB_Camera3dSettings(0.0f,0.0f,5.0f, 1,0,0, 0,0,0);
         GRRLIB_2dMode();
@@ -164,9 +163,9 @@ int main(void){
         double P1MX = P1Mote.sx - 190;
         double P1MY = P1Mote.sy - 190;
 
-        turret_angle+=0.4;
-        if (turret_angle>360) {
-            turret_angle=0.0;
+        view_angle+=0.1;
+        if (view_angle>90) {
+            view_angle=0.0;
         }
 
         // First, translate the points to the game plane
@@ -224,7 +223,7 @@ int main(void){
         // Calculate the angle between the points in radians
         // double angleRad = angleBetweenPoints(P1MX, P1MY, 320, 240);
         GRRLIB_DrawImg(P1MX, P1MY, crosshair, 0, 0.3, 0.3, RGBA(255, 255, 255, 255));
-        GRRLIB_Line(320, 205, P1MX, P1MY, 0x00FF00FF);
+        GRRLIB_Line(320, midPoint, P1MX, P1MY, 0x00FF00FF);
         // GRRLIB_DrawImg(gameX, P1MY - offset, crosshair, 0, 1, 1, RGBA(255, 0, 0, 255));
 
         // GRRLIB_Printf((640-(16*29))/2, 20, tex_font, 0xFFFFFFFF, 1, "TURRET ANGLE: %4.2f", turret_angle);
