@@ -4,4 +4,14 @@
         "cstdint": "cpp",
         "format": "cpp"
     },
+    "C_Cpp.codeAnalysis.clangTidy.checks.enabled": [
+        "modernize-*",
+        "bugprone-*"
+    ],
+    "cSpell.diagnosticLevel": "Hint",
+    "C_Cpp.default.compilerPath": "/opt/devkitpro/devkitPPC/bin/powerpc-eabi-g++",
+    "C_Cpp.codeAnalysis.exclude": {
+        "**examples/**": true,
+    },
+    "C_Cpp.codeAnalysis.clangTidy.enabled": true,
 }

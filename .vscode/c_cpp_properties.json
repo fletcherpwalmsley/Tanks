@@ -1,0 +1,15 @@
+{
+    "configurations": [
+        {
+            "name": "Linux",
+            "includePath": [
+                "${workspaceFolder}/**",
+                "/opt/devkitpro/portlibs/wii/include",
+                "/opt/devkitpro/portlibs/wii/include/**",
+                "/opt/devkitpro/libogc/include"
+            ],
+            "defines": []
+        }
+    ],
+    "version": 4
+}
