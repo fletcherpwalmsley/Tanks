@@ -7,11 +7,16 @@
 class Box2dWorld {
  public:
   Box2dWorld();
-  void Step() { b2World_Step(worldId, 1.0f / 60.0f, 4); }
+  void Step();
   auto getStaticItems() -> std::vector<b2ShapeId>;
+  auto getDynamicItems() -> std::vector<b2ShapeId>;
+  // auto getDynamicItems() -> b2ShapeId;
+  void createBox(int x, int y);
 
  private:
-  b2WorldId worldId;
-  b2BodyId groundId;
-  b2BodyId wallsId;
+  b2WorldId m_worldId;
+  b2BodyId m_groundId;
+  b2BodyId m_wallsId;
+  std::vector<b2BodyId> m_dynamicIds;
+  b2BodyId tempId;
 };
