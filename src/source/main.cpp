@@ -8,7 +8,7 @@ using std::cout;
 int main(int argc, char **argv) {
   Box2dWorld sim;
   WorldDraw2d draw;
-  while (1) {
+  while (true) {
     sim.Step();
     draw.NewFrame();
     for (auto id : sim.getStaticItems()) {

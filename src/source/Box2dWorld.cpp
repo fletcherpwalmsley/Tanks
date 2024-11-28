@@ -32,7 +32,7 @@ Box2dWorld::Box2dWorld() {
   b2CreatePolygonShape(wallsId, &groundShapeDef, &box2);
 };
 
-std::vector<b2ShapeId> Box2dWorld::getStaticItems() {
+auto Box2dWorld::getStaticItems() -> std::vector<b2ShapeId> {
   int shapeCount = b2Body_GetShapeCount(wallsId);
   std::vector<b2ShapeId> shapeIds(shapeCount);
   int returnCount = b2Body_GetShapes(wallsId, shapeIds.data(), shapeCount);

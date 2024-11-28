@@ -1,9 +1,9 @@
 #include "WorldDraw2d.h"
 
 #include <grrlib.h>
-#include <math.h>
 
 #include <cassert>
+#include <cmath>
 
 WorldDraw2d::WorldDraw2d() { GRRLIB_Init(); }
 
@@ -35,16 +35,16 @@ void WorldDraw2d::DrawRotatedRectangle(float cx, float cy, float width, float he
   };
 
   // Rotate each corner around the center (cx, cy)
-  for (int i = 0; i < 4; ++i) {
-    float x = corners[i][0] - cx;
-    float y = corners[i][1] - cy;
+  for (auto& corner : corners) {
+    float x = corner[0] - cx;
+    float y = corner[1] - cy;
 
     // Apply rotation matrix
     float new_x = x * cos(radians) - y * sin(radians) + cx;
     float new_y = x * sin(radians) + y * cos(radians) + cy;
 
-    corners[i][0] = new_x;
-    corners[i][1] = new_y;
+    corner[0] = new_x;
+    corner[1] = new_y;
   }
 
   // Draw the lines connecting the rotated corners

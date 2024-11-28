@@ -12,6 +12,6 @@ class WorldDraw2d {
   void DrawId(b2ShapeId& polygon);
 
  private:
-  const int WorldToWindowScale = 5.0f;
+  const float WorldToWindowScale = 5.0f;
   void Draw(b2Polygon polygon);
 };

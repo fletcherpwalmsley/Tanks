@@ -7,8 +7,8 @@
 class Box2dWorld {
  public:
   Box2dWorld();
-  void Step() { b2World_Step(worldId, 1 / 60, 4); }
-  std::vector<b2ShapeId> getStaticItems();
+  void Step() { b2World_Step(worldId, 1.0f / 60.0f, 4); }
+  auto getStaticItems() -> std::vector<b2ShapeId>;
 
  private:
   b2WorldId worldId;
